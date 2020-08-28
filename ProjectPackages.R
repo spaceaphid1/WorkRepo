@@ -1,0 +1,7 @@
+install.packages("ggplot2")
+install.packages("tidyverse")
+install.packages("nlme")
+install.packages("lme4")
+install.packages("wesanderson")
+install.packages("gridExtra")
+install.packages("lattice")
