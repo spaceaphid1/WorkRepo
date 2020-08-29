@@ -10,6 +10,7 @@ library(tidyverse)
 library(lme4)
 library(nlme)
 library(lattice)
+library(wesanderson)
 
 
 #### Questions, Hypothesis, Prediction ####
@@ -144,5 +145,17 @@ veglme_noint_summary <- summary(veglme_log_uv_noint)
 vegOutput_df <- data.frame(poolmean = veglme_noint_summary$tTable[,1],
                    poolse = veglme_noint_summary$tTable[,2],
                    trtCat = levels(as.factor(weightDat$PoolType)))
+#Final Plot
 
-
+ggplot(vegOutput_df, aes(trtCat, poolmean)) +
+  geom_point() +
+  geom_errorbar(aes(ymin=poolmean-poolse, ymax=poolmean+poolse, col = factor(trtCat)), width = 0.4, show.legend = F) +
+  geom_jitter(data = weightDat, aes(PoolType, logVegWt, col = factor(PoolType)), width = 0.07, alpha = 0.4, show.legend = F) +
+  scale_color_manual(values = wes_palette("GrandBudapest1")) +
+  xlab("Pool Type") +
+  ylab("Vegitative Biomass (g) - log transformed") +
+  ggtitle("Stress Response to Habitat Type") +
+  theme_light() +
+  annotate("text", x= 1, y = 3.2, label = "a") +
+  annotate("text", x= 2, y = 4.2, label = "a")
+  
