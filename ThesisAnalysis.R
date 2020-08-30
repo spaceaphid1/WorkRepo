@@ -288,19 +288,19 @@ qqnorm(investlme_log_uv, ~resid(., type = "p"), abline = c(0,1))
 
 #' Performing anova on equal and unequal variance models of log transformed data
 
-anova(investlme_log, investlme_log_uv) #suggests that equal variances model is worth using
+anova(investlme_log, investlme_log_uv) #suggests that unequal variances model is worth using
 
 #' __Results of Model: Final Answer__
 #' The above model suggests that there is no difference in mean veg biomass between created and natural pools. This suggests that, when using vegetative biomass as a predictor of stress, the two habitats do not affect the plants deferentially.
-summary_lme_repro_model <- summary(reprolme_log) 
+summary_lme_repro_model <- summary(reprolme_log_uv) 
 #' 
 #' __Plotting the Results__
 
 #fitting same model from final answer with no intercept for plotting:
 
-investlme_log_noint <- linvestlme_log <- lme(logReproPropn~ 0 + PoolType , random = ~1 | PoolID/Trans, data = infloDat)
+investlme_log_uv_noint <- lme(logReproPropn~ 0 + PoolType , random = ~1 | PoolID/Trans, data = infloDat, weights = varIdent(form = ~1|PoolType))
 
-investlme_noint_summary <- summary(investlme_log_noint)
+investlme_noint_summary <- summary(investlme_log_uv_noint)
 
 #creating data frame for plotting:
 reproOutput_df <- data.frame(poolmean = investlme_noint_summary$tTable[,1],
@@ -321,11 +321,40 @@ investPlot <- ggplot() +
   annotate("text", x= 2, y = 2.43, label = "b")
 investPlot 
 
+
+#' __Investigating the Nature of Variance Structures in the Natural Pool__
+#' We'll be dealing with the same three variable as before, but since dealing only with the natural pool type
+#'Creating New Data Natural Pool Type Frame:
+
+natDat <- bealeDat %>%
+  filter(PoolType == "Natural")
+
+#' Below, we will be investigating to see if there is a potential difference in response variable behavior by PoolID
+ 
+#' Veg Biomass:
+
+natVegDat <- natDat %>%
+  filter(!is.na(VegWt))
+
+ggplot(natVegDat, aes(PoolID, VegWt)) +
+  geom_boxplot()
+#it seems like there might be a difference in veg biomass among each pool.
+
+#testing
+
+natVeglme <- lme(VegWt~PoolID , random = ~1 | Trans, data = natVegDat)
+summary(natVeglme)
+
+#testing for overall treatment effect
+anova(natVeglme)#seems the difference is significant
+
+plot.lme(natVeglme)
+
 #### Final Analyis Plot ####
 
 #' __Final Analysis Multiplot__
 
 finalPlot <- grid.arrange(vegPlot, reproPlot, investPlot, nrow = 1, top = "Biomass Response to Habitat Type")
 
-#### Spinning to html ####
+#### Spinning to html and markdown ####
 spin("/Users/jacksonanderson/WorkRepo/ThesisAnalysis.R")
