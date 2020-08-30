@@ -292,7 +292,7 @@ anova(investlme_log, investlme_log_uv) #suggests that unequal variances model is
 
 #' __Results of Model: Final Answer__
 #' The above model suggests that there is no difference in mean veg biomass between created and natural pools. This suggests that, when using vegetative biomass as a predictor of stress, the two habitats do not affect the plants deferentially.
-summary_lme_repro_model <- summary(reprolme_log_uv) 
+summary_lme_invest_model <- summary(investlme_log_uv) 
 #' 
 #' __Plotting the Results__
 
