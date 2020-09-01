@@ -348,7 +348,24 @@ summary(natVeglme)
 #testing for overall treatment effect
 anova(natVeglme)#seems the difference is significant
 
+#Diagnostics
 plot.lme(natVeglme)
+
+qqnorm(natVeglme, ~resid(., type = "p"), abline = c(0,1))
+
+#Unequal variances model 
+
+natVeglme_uv <- lme(VegWt~PoolID , random = ~1 | Trans, data = natVegDat, weights = varIdent(form = ~1|PoolID))
+
+summary(natVeglme_uv)
+
+#testing for overall treatment effect
+anova(natVeglme_uv) #seems the difference is significant
+
+#Diagnostics
+plot.lme(natVeglme_uv)
+
+qqnorm(natVeglme_uv, ~resid(., type = "p"), abline = c(0,1))
 
 #### Final Analyis Plot ####
 
