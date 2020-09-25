@@ -24,17 +24,43 @@ library(plotrix)
 
 dat <- read_csv("~/Repos/WorkRepo/stravaDatCSV.csv")
 
-dat$diffAdj <- rep(NA, length(dat$Time))
-  
-  for( i in 1:length(dat$Time)) {
-  dat$diffAdj[i] <- dat$Time[i] - dat$Time[i +1]
+dat$time <- dat$minute + dat$second/60
+
+
+dat$diffAdj <- rep(NA, length(dat$minute))
+
+  for( i in 1:length(dat$time)) {
+  dat$diffAdj[i] <- dat$time[i] - dat$time[i + 1]
   }
 
-meanTime <- mean(dat$Time)
+dat <- dat[, - c(2,3)]
+dat <- dat[- c(26:30),]
+
+meanTime <- mean(dat$time)
 meanTime
 meanDiff <- mean(dat$diffAdj, na.rm = T)
 meanDiff
 sd <- sd(dat$diffAdj, na.rm = T)
+sd
+se <- sd/ sqrt(length(dat$diffAdj -1))
+se#in minutes
+seSec <- se*60
+seSec
+
+timeSpeed <- lm(dat$time ~ dat$avgSpeed)
+summary(timeSpeed)
+
+ggplot(dat, aes(avgSpeed, time)) +
+  geom_point() +
+  geom_smooth()
+#'near perfect exponential decay between speed and time
+
+
+
+#'the standard error above indicates that there is a potential for each recorded strava time to be off by +/- 7 seconds! 
+
+3.72822727273e-6
+hist(dat$diffAdj)
 
 theorDist <- rnorm(1000, meanDiff, sd)
 hist(theorDist)
@@ -43,3 +69,5 @@ meanTheor <- mean(theorDist)
 sdTheor <- sd(theorDist)
 
 pnorm(meanDiff, meanTheor, sdTheor)
+
+
